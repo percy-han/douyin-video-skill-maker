@@ -71,6 +71,22 @@ echo "🐍 检查Python版本..."
 PYTHON_VERSION=$($PYTHON_CMD --version)
 echo "   $PYTHON_VERSION"
 
+# 检查并修复pip
+echo ""
+echo "🔧 检查pip..."
+if ! $PIP_CMD --version &> /dev/null; then
+    echo "   ⚠️  pip不可用，正在修复..."
+    $PYTHON_CMD -m ensurepip --upgrade 2>/dev/null || {
+        echo "   使用get-pip.py修复..."
+        curl -sS https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+        $PYTHON_CMD /tmp/get-pip.py
+        rm -f /tmp/get-pip.py
+    }
+    echo "   ✅ pip已修复"
+else
+    echo "   ✅ pip可用"
+fi
+
 # 安装系统依赖（如果需要）
 echo ""
 echo "📦 检查系统依赖..."
