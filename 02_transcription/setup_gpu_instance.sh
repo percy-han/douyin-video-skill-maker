@@ -123,7 +123,7 @@ fi
 # 安装Whisper和其他依赖
 echo ""
 echo "📦 安装Python依赖..."
-$PIP_CMD install --upgrade pip --quiet
+$PIP_CMD install --upgrade pip setuptools wheel --quiet
 
 if [ -f requirements.txt ]; then
     echo "   从requirements.txt安装..."
