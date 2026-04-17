@@ -25,6 +25,7 @@ from typing import Dict, List, Optional
 S3_BUCKET = os.environ.get('S3_BUCKET', 'percyhan-douyin-video')
 S3_PREFIX = os.environ.get('S3_PREFIX', 'douyin_videos/20260417_150000/')
 WHISPER_MODEL = os.environ.get('WHISPER_MODEL', 'large')
+ENABLE_COGNITIVE_EXTRACTION = os.environ.get('ENABLE_COGNITIVE_EXTRACTION', 'false').lower() == 'true'
 TEMP_DIR = '/tmp/transcribe_temp'
 OUTPUT_DIR = '/tmp/transcribe_output'
 
@@ -481,16 +482,23 @@ class BatchProcessor:
                 # 转录
                 result = self.transcriber.transcribe(local_video)
 
-                # 提取认知框架
-                framework = self.cognitive_extractor.extract_framework(
-                    result['text'],
-                    task['metadata']
-                )
+                # 提取认知框架（可选）
+                framework = None
+                if ENABLE_COGNITIVE_EXTRACTION:
+                    framework = self.cognitive_extractor.extract_framework(
+                        result['text'],
+                        task['metadata']
+                    )
 
                 # 构建完整结果
+                # 转换datetime对象为字符串
+                metadata_serializable = {**task['metadata']}
+                if 'publish_datetime' in metadata_serializable and metadata_serializable['publish_datetime']:
+                    metadata_serializable['publish_datetime'] = metadata_serializable['publish_datetime'].isoformat()
+
                 enhanced_result = {
                     'video_metadata': {
-                        **task['metadata'],
+                        **metadata_serializable,
                         's3_key': task['s3_key'],
                         'file_size_bytes': task['size']
                     },
