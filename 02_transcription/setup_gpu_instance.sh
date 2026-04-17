@@ -100,30 +100,42 @@ if [ "$CUDA_AVAILABLE" = "True" ]; then
     echo "   💎 GPU型号: $GPU_NAME"
 else
     echo "   ⚠️  PyTorch CUDA不可用"
+    echo "   安装PyTorch（CUDA 12.1版本）..."
+    $PIP_CMD install --upgrade pip --quiet
+    $PIP_CMD install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 --quiet
 
-    if [ "$PYTORCH_ACTIVATED" = true ]; then
-        echo "   ❌ 虚拟环境中PyTorch不可用，请检查环境"
-        exit 1
+    # 再次验证
+    CUDA_AVAILABLE=$($PYTHON_CMD -c "import torch; print(torch.cuda.is_available())")
+    if [ "$CUDA_AVAILABLE" = "True" ]; then
+        echo "   ✅ PyTorch CUDA安装成功"
+        PYTORCH_VERSION=$($PYTHON_CMD -c "import torch; print(torch.__version__)")
+        CUDA_VERSION=$($PYTHON_CMD -c "import torch; print(torch.version.cuda)")
+        GPU_COUNT=$($PYTHON_CMD -c "import torch; print(torch.cuda.device_count())")
+        GPU_NAME=$($PYTHON_CMD -c "import torch; print(torch.cuda.get_device_name(0))")
+        echo "   📦 PyTorch版本: $PYTORCH_VERSION"
+        echo "   🔧 CUDA版本: $CUDA_VERSION"
+        echo "   🎮 GPU数量: $GPU_COUNT"
+        echo "   💎 GPU型号: $GPU_NAME"
     else
-        echo "   安装PyTorch（CUDA 12.1版本）..."
-        $PIP_CMD install --upgrade pip --quiet
-        $PIP_CMD install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 --quiet
-
-        # 再次验证
-        CUDA_AVAILABLE=$($PYTHON_CMD -c "import torch; print(torch.cuda.is_available())")
-        if [ "$CUDA_AVAILABLE" = "True" ]; then
-            echo "   ✅ PyTorch CUDA安装成功"
-        else
-            echo "   ❌ PyTorch CUDA安装失败"
-            exit 1
-        fi
+        echo "   ❌ PyTorch CUDA安装失败"
+        exit 1
     fi
 fi
 
 # 安装Whisper和其他依赖
 echo ""
 echo "📦 安装Python依赖..."
-$PIP_CMD install --upgrade pip setuptools wheel --quiet
+
+# 清理损坏的包（如果存在）
+if [ "$PYTORCH_ACTIVATED" = true ]; then
+    echo "   清理损坏的包..."
+    find /opt/pytorch/lib/python*/site-packages -name '~*' -type d 2>/dev/null | while read dir; do
+        sudo rm -rf "$dir" 2>/dev/null || true
+    done
+fi
+
+echo "   升级pip和构建工具..."
+$PIP_CMD install --upgrade pip setuptools wheel --quiet --force-reinstall
 
 if [ -f requirements.txt ]; then
     echo "   从requirements.txt安装..."
