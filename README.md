@@ -134,7 +134,8 @@ cd douyin-video-skill-maker/02_transcription
 # 配置并执行转录
 export S3_BUCKET=your-bucket
 export S3_PREFIX=douyin_videos/20260417/
-python3 batch_transcribe_s3.py
+# 注意：如果脚本检测到PyTorch venv，使用python（不是python3）
+python batch_transcribe_s3.py
 ```
 
 **输出**：每个视频生成3个文件（TXT + SRT + JSON）
