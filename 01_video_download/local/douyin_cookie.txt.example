@@ -1,0 +1,12 @@
+# 抖音Cookie示例文件
+# 请将此文件复制为 douyin_cookie.txt 并填入你的真实Cookie
+
+# 获取方法：
+# 1. 在浏览器中登录 https://www.douyin.com
+# 2. 按F12打开开发者工具
+# 3. 切换到Console标签
+# 4. 输入: document.cookie
+# 5. 复制完整输出（通常500-2000个字符）
+# 6. 粘贴到下方（删除这些注释）
+
+ttwid=1%7CYourActualCookieHere...; passport_csrf_token=...; odin_tt=...

@@ -1,0 +1,72 @@
+# 敏感文件
+douyin_cookie.txt
+*.pem
+*.key
+*.env
+.env.*
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 下载的视频和输出
+batch_output/
+output/
+test_output/
+downloads/
+temp_*/
+douyin_downloader/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# TikTokDownload source (已包含在pip安装中)
+TikTokDownload/
+
+# 测试文件
+test_download_single.py
+test_with_cookie.py
+alternative_download.py
