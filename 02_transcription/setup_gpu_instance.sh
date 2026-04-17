@@ -118,7 +118,13 @@ else
     echo "   ⚠️  PyTorch CUDA不可用"
     echo "   安装PyTorch（CUDA 12.1版本）..."
     $PIP_CMD install --upgrade pip --quiet
-    $PIP_CMD install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 --quiet
+
+    # 尝试安装torch和torchvision（torchaudio对Whisper非必需）
+    echo "   正在下载PyTorch..."
+    $PIP_CMD install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+    # 尝试安装torchaudio（如果失败也继续）
+    $PIP_CMD install torchaudio --index-url https://download.pytorch.org/whl/cu121 2>/dev/null || echo "   ⚠️  torchaudio安装失败（非必需，可忽略）"
 
     # 再次验证
     CUDA_AVAILABLE=$($PYTHON_CMD -c "import torch; print(torch.cuda.is_available())")
