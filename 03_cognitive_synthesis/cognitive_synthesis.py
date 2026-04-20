@@ -311,7 +311,8 @@ class SingleVideoCognitiveExtractor:
         raw_text = transcript_data['transcription']['text']
         metadata = transcript_data['video_metadata']
 
-        if len(raw_text) < 100:
+        # 跳过极短的转录（可能是转录失败）
+        if len(raw_text) < 25:
             return None
 
         prompt = f"""# 原始语音转录 (Whisper输出，未清洗)
