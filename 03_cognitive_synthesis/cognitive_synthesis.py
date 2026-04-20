@@ -483,7 +483,7 @@ class SingleVideoCognitiveExtractor:
                 body=json.dumps({
                     'anthropic_version': 'bedrock-2023-05-31',
                     'max_tokens': 8192,
-                    'temperature': 0.0,
+                    # 注意: Opus 4.7不支持temperature参数，已移除
                     'messages': [{'role': 'user', 'content': prompt}]
                 })
             )
