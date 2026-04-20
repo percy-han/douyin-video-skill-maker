@@ -21,6 +21,14 @@ from typing import Dict, List, Optional
 from collections import Counter
 import re
 
+# ==================== 配置 ====================
+
+# Bedrock模型ID（可通过环境变量覆盖）
+BEDROCK_MODEL_ID = os.environ.get(
+    'BEDROCK_MODEL_ID',
+    'anthropic.claude-opus-4-20250514-v1:0'  # 默认使用标准区域模型
+)
+
 # ==================== 三重验证器 ====================
 
 class MentalModelValidator:
@@ -110,7 +118,7 @@ class MentalModelValidator:
 
         try:
             response = self.bedrock.invoke_model(
-                modelId='us.anthropic.claude-opus-4-20250514-v1:0',
+                modelId=BEDROCK_MODEL_ID,
                 body=json.dumps({
                     'anthropic_version': 'bedrock-2023-05-31',
                     'max_tokens': 2048,
@@ -471,7 +479,7 @@ class SingleVideoCognitiveExtractor:
 
         try:
             response = self.bedrock.invoke_model(
-                modelId='us.anthropic.claude-opus-4-20250514-v1:0',
+                modelId=BEDROCK_MODEL_ID,
                 body=json.dumps({
                     'anthropic_version': 'bedrock-2023-05-31',
                     'max_tokens': 8192,
@@ -755,7 +763,7 @@ class CognitiveSynthesizer:
 
         try:
             response = self.bedrock.invoke_model(
-                modelId='us.anthropic.claude-opus-4-20250514-v1:0',
+                modelId=BEDROCK_MODEL_ID,
                 body=json.dumps({
                     'anthropic_version': 'bedrock-2023-05-31',
                     'max_tokens': 8192,
