@@ -888,8 +888,8 @@ description: |
 
 """
 
-        # 添加心智模型
-        for i, model in enumerate(synthesis['mental_models'][:7], 1):
+        # 添加心智模型（完整版）
+        for i, model in enumerate(synthesis['mental_models'], 1):
             skill_content += f"""
 ### 模型{i}：{model['pattern']}
 
@@ -897,23 +897,32 @@ description: |
 
 **证据**（跨域复现）：
 """
-            for quote in model['quotes'][:3]:
+            # 显示更多引用（最多5个）
+            for quote in model['quotes'][:5]:
                 skill_content += f"- {quote}\n"
 
             evidence = model['validation']['evidence']
             if 'cross_domain' in evidence:
-                skill_content += f"\n**跨域验证**：出现在 {', '.join(evidence['cross_domain'].get('domains', []))} 等{len(evidence['cross_domain'].get('domains', []))}个话题\n"
+                domains = evidence['cross_domain'].get('domains', [])
+                skill_content += f"\n**跨域验证**：出现在 {', '.join(domains[:5])} 等{len(domains)}个话题\n"
+
+            # 添加置信度
+            confidence = model['validation'].get('confidence', 0)
+            skill_content += f"**置信度**：{confidence:.2f}\n"
 
             skill_content += f"\n**应用**：当分析[相关场景]时，使用这个框架...\n"
             skill_content += f"\n**局限**：这个模型假设...\n"
             skill_content += "\n---\n"
 
-        # 添加决策启发式
+        # 添加决策启发式（完整版）
         skill_content += "\n## 决策启发式\n\n"
-        for i, heuristic in enumerate(synthesis['heuristics'][:10], 1):
+        for i, heuristic in enumerate(synthesis['heuristics'], 1):
             skill_content += f"{i}. **{heuristic['pattern']}**\n"
             if heuristic['quotes']:
-                skill_content += f"   - 案例：{heuristic['quotes'][0]}\n\n"
+                # 显示更多案例（最多3个）
+                for j, quote in enumerate(heuristic['quotes'][:3], 1):
+                    skill_content += f"   - 案例{j}：{quote}\n"
+            skill_content += "\n"
 
         # 添加表达DNA
         dna = synthesis['expression_dna']
@@ -991,6 +1000,135 @@ description: |
         print(f"   ✅ 已保存: {output_path}")
         print(f"   📄 文件大小: {len(skill_content)} 字符")
 
+
+def generate_appendix(synthesis: dict, output_path: str):
+    """生成深度研究补充文档（完整验证细节）"""
+
+    print("\n📚 生成深度研究补充文档...")
+
+    appendix = f"""# 刘德超认知框架 - 深度研究补充文档
+
+> 本文档包含所有心智模型和决策启发式的完整验证细节、置信度评分、视频溯源
+
+**生成时间**: {synthesis['metadata']['synthesis_date']}
+**数据范围**: {synthesis['metadata']['date_range']['start']} ~ {synthesis['metadata']['date_range']['end']}
+**视频总数**: {synthesis['metadata']['total_videos']}
+
+---
+
+## 📊 统计概览
+
+- **心智模型**: {len(synthesis['mental_models'])} 个
+- **决策启发式**: {len(synthesis['heuristics'])} 条
+- **平均置信度**: {sum(m['validation']['confidence'] for m in synthesis['mental_models'])/len(synthesis['mental_models']):.3f}
+
+---
+
+## 🧠 完整心智模型列表（按置信度排序）
+
+"""
+
+    # 按置信度排序
+    sorted_models = sorted(
+        synthesis['mental_models'],
+        key=lambda x: x['validation']['confidence'],
+        reverse=True
+    )
+
+    for i, model in enumerate(sorted_models, 1):
+        validation = model['validation']
+        evidence = validation['evidence']
+
+        appendix += f"""
+### {i}. {model['pattern']}
+
+**置信度**: {validation['confidence']:.3f}
+
+**三重验证详情**:
+
+1. **跨域复现** (Cross-Domain)
+   - 复现次数: {evidence.get('cross_domain', {}).get('occurrence_count', 0)} 次
+   - 涉及领域: {', '.join(evidence.get('cross_domain', {}).get('domains', [])[:10])}
+   - 领域数量: {len(evidence.get('cross_domain', {}).get('domains', []))}
+
+2. **生成力** (Generative Power)
+   - 预测能力: {evidence.get('generative_power', {}).get('can_predict_stance', False)}
+   - 应用场景: {evidence.get('generative_power', {}).get('example_predictions', '未提供')}
+
+3. **排他性** (Distinctiveness)
+   - 独特视角: {evidence.get('distinctiveness', {}).get('is_unique_perspective', False)}
+   - 差异说明: {evidence.get('distinctiveness', {}).get('differentiation', '未提供')}
+
+**典型引用**:
+"""
+        for j, quote in enumerate(model['quotes'][:10], 1):
+            appendix += f"{j}. {quote}\n"
+
+        appendix += "\n---\n"
+
+    # 决策启发式部分
+    appendix += "\n## 📋 完整决策启发式列表\n\n"
+
+    sorted_heuristics = sorted(
+        synthesis['heuristics'],
+        key=lambda x: x['validation']['confidence'],
+        reverse=True
+    )
+
+    for i, heuristic in enumerate(sorted_heuristics, 1):
+        validation = heuristic['validation']
+
+        appendix += f"""
+### {i}. {heuristic['pattern']}
+
+**置信度**: {validation['confidence']:.3f}
+
+**验证证据**:
+- 复现次数: {validation.get('evidence', {}).get('cross_domain', {}).get('occurrence_count', 0)}
+- 涉及领域: {', '.join(validation.get('evidence', {}).get('cross_domain', {}).get('domains', [])[:5])}
+
+**案例引用**:
+"""
+        for j, quote in enumerate(heuristic['quotes'][:5], 1):
+            appendix += f"{j}. {quote}\n"
+
+        appendix += "\n---\n"
+
+    # 元数据部分
+    appendix += f"""
+## 📁 元数据与溯源
+
+### 视频框架统计
+
+- 成功提取: {synthesis['metadata'].get('successful_extractions', 0)} 个
+- 提取失败: {synthesis['metadata'].get('failed_extractions', 0)} 个
+
+### 方法论
+
+本框架基于零清洗策略（Zero-Cleaning Strategy）:
+- 直接处理原始转录文本（包含口语化表达、停顿词等）
+- 使用 Claude Opus 4.7 进行认知信号提取
+- 三重验证方法论（跨域、生成力、排他性）
+
+### 数据溯源
+
+完整单视频框架数据: `video_frameworks.json`
+完整合成数据: `cognitive_synthesis.json`
+
+---
+
+**文档生成**: {synthesis['metadata']['synthesis_date']}
+"""
+
+    # 保存文件
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(appendix)
+
+    print(f"   ✅ 已保存补充文档: {output_path}")
+    print(f"   📄 文件大小: {len(appendix)} 字符")
+
+
 # ==================== 主函数 ====================
 
 def main():
@@ -1039,20 +1177,25 @@ def main():
     synthesizer = CognitiveSynthesizer()
     synthesis = synthesizer.synthesize(all_transcripts, OUTPUT_DIR)
 
-    # 3. 生成SKILL.md
+    # 3. 生成SKILL.md（完整版）
     skill_generator = SkillGenerator()
-    skill_path = os.path.join(OUTPUT_DIR, 'SKILL.md')
+    skill_path = os.path.join(OUTPUT_DIR, 'SKILL_FULL.md')
     skill_generator.generate(synthesis, skill_path)
 
-    # 4. 保存完整的synthesis JSON
+    # 4. 生成深度研究补充文档
+    appendix_path = os.path.join(OUTPUT_DIR, 'SKILL_APPENDIX.md')
+    generate_appendix(synthesis, appendix_path)
+
+    # 5. 保存完整的synthesis JSON
     synthesis_path = os.path.join(OUTPUT_DIR, 'cognitive_synthesis.json')
     with open(synthesis_path, 'w', encoding='utf-8') as f:
         json.dump(synthesis, f, ensure_ascii=False, indent=2)
     print(f"\n💾 完整数据已保存: {synthesis_path}")
 
-    # 5. 上传到S3
+    # 6. 上传到S3
     print(f"\n☁️  上传到S3...")
-    s3.upload_file(skill_path, S3_BUCKET, f"{S3_PREFIX}SKILL.md")
+    s3.upload_file(skill_path, S3_BUCKET, f"{S3_PREFIX}SKILL_FULL.md")
+    s3.upload_file(appendix_path, S3_BUCKET, f"{S3_PREFIX}SKILL_APPENDIX.md")
     s3.upload_file(synthesis_path, S3_BUCKET, f"{S3_PREFIX}cognitive_synthesis.json")
 
     # 上传单视频框架
@@ -1061,13 +1204,16 @@ def main():
         s3.upload_file(video_frameworks_path, S3_BUCKET, f"{S3_PREFIX}video_frameworks.json")
 
     print("\n" + "="*60)
-    print("🎉 认知框架合成完成！")
+    print("🎉 认知框架合成完成（完整版）！")
     print("="*60)
     print(f"心智模型：{len(synthesis['mental_models'])} 个")
     print(f"决策启发式：{len(synthesis['heuristics'])} 条")
     print(f"表达DNA：已量化")
-    print(f"SKILL.md: s3://{S3_BUCKET}/{S3_PREFIX}SKILL.md")
-    print(f"单视频框架: s3://{S3_BUCKET}/{S3_PREFIX}video_frameworks.json")
+    print(f"\n📁 输出文件:")
+    print(f"  完整SKILL: s3://{S3_BUCKET}/{S3_PREFIX}SKILL_FULL.md")
+    print(f"  深度研究: s3://{S3_BUCKET}/{S3_PREFIX}SKILL_APPENDIX.md")
+    print(f"  完整数据: s3://{S3_BUCKET}/{S3_PREFIX}cognitive_synthesis.json")
+    print(f"  单视频框架: s3://{S3_BUCKET}/{S3_PREFIX}video_frameworks.json")
 
 if __name__ == '__main__':
     main()
