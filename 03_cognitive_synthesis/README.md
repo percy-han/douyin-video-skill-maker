@@ -205,13 +205,30 @@ description: 刘德超财经分析思维框架
 ```bash
 cd 03_cognitive_synthesis
 
-# 配置环境变量
-export S3_BUCKET=your-bucket-name
-export S3_PREFIX=douyin_videos/20260417_150000/
+# ⚠️ 必须配置环境变量（根据你的实际S3路径）
+export S3_BUCKET=percyhan-douyin-video
+export S3_PREFIX=post/刘德超/
 
 # 执行合成
 python3 cognitive_synthesis.py
 ```
+
+**⚠️ 重要说明**：
+
+1. **S3路径必须正确设置**：
+   - 代码默认值是 `douyin_videos/20260417_150000/`（可能不是你的实际路径）
+   - 必须通过环境变量 `S3_PREFIX` 设置为你的转录文件实际所在路径
+   - 转录文件命名格式：`*_transcript.json`
+
+2. **Screen/Tmux用户注意**：
+   - 如果在 screen 或 tmux 中运行，每次重新连接会话后环境变量会丢失
+   - 需要重新执行 `export` 命令
+
+3. **验证S3路径**：
+   ```bash
+   # 运行前先确认转录文件存在
+   aws s3 ls s3://${S3_BUCKET}/${S3_PREFIX} --recursive | grep transcript.json
+   ```
 
 ### 工作流程
 
