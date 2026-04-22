@@ -81,12 +81,12 @@ def generate_appendix(synthesis: dict, output_path: str):
 
     sorted_heuristics = sorted(
         synthesis['heuristics'],
-        key=lambda x: x['validation'].get('confidence', 0),
+        key=lambda x: x.get('validation', {}).get('confidence', 0),
         reverse=True
     )
 
     for i, heuristic in enumerate(sorted_heuristics, 1):
-        validation = heuristic['validation']
+        validation = heuristic.get('validation', {})
 
         appendix += f"""
 ### {i}. {heuristic['pattern']}
@@ -99,7 +99,7 @@ def generate_appendix(synthesis: dict, output_path: str):
 
 **案例引用**:
 """
-        for j, quote in enumerate(heuristic['quotes'][:5], 1):
+        for j, quote in enumerate(heuristic.get('quotes', [])[:5], 1):
             appendix += f"{j}. {quote}\n"
 
         appendix += "\n---\n"
