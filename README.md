@@ -131,9 +131,9 @@ git clone https://github.com/percy-han/douyin-video-skill-maker.git
 cd douyin-video-skill-maker/02_transcription
 ./setup_gpu_instance.sh
 
-# 配置并执行转录
-export S3_BUCKET=your-bucket
-export S3_PREFIX=douyin_videos/20260417/
+# 配置并执行转录（根据实际S3路径修改）
+export S3_BUCKET=percyhan-douyin-video
+export S3_PREFIX=post/刘德超/
 # 注意：如果脚本检测到PyTorch venv，使用python（不是python3）
 python batch_transcribe_s3.py
 ```
@@ -147,13 +147,18 @@ python batch_transcribe_s3.py
 ```bash
 cd 03_cognitive_synthesis
 
-# 配置环境变量
-export S3_BUCKET=your-bucket
-export S3_PREFIX=douyin_videos/20260417/
+# ⚠️ 配置环境变量（必须根据实际S3路径修改）
+export S3_BUCKET=percyhan-douyin-video
+export S3_PREFIX=post/刘德超/
 
 # 执行认知合成
 python3 cognitive_synthesis.py
 ```
+
+**⚠️ 重要提示**：
+- `S3_PREFIX` 必须设置为实际存放转录文件的路径
+- 如果在 screen/tmux 中运行，重新连接后需要重新 export 环境变量
+- 验证路径：`aws s3 ls s3://${S3_BUCKET}/${S3_PREFIX} --recursive | grep transcript.json`
 
 **工作流程**：
 1. 从S3加载所有转录JSON
