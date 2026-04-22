@@ -1020,7 +1020,7 @@ def generate_appendix(synthesis: dict, output_path: str):
 
 - **心智模型**: {len(synthesis['mental_models'])} 个
 - **决策启发式**: {len(synthesis['heuristics'])} 条
-- **平均置信度**: {sum(m['validation']['confidence'] for m in synthesis['mental_models'])/len(synthesis['mental_models']):.3f}
+- **平均置信度**: {sum(m['validation'].get('confidence', 0) for m in synthesis['mental_models'])/len(synthesis['mental_models']):.3f}
 
 ---
 
@@ -1031,18 +1031,18 @@ def generate_appendix(synthesis: dict, output_path: str):
     # 按置信度排序
     sorted_models = sorted(
         synthesis['mental_models'],
-        key=lambda x: x['validation']['confidence'],
+        key=lambda x: x['validation'].get('confidence', 0),
         reverse=True
     )
 
     for i, model in enumerate(sorted_models, 1):
         validation = model['validation']
-        evidence = validation['evidence']
+        evidence = validation.get('evidence', {})
 
         appendix += f"""
 ### {i}. {model['pattern']}
 
-**置信度**: {validation['confidence']:.3f}
+**置信度**: {validation.get('confidence', 0):.3f}
 
 **三重验证详情**:
 
@@ -1071,7 +1071,7 @@ def generate_appendix(synthesis: dict, output_path: str):
 
     sorted_heuristics = sorted(
         synthesis['heuristics'],
-        key=lambda x: x['validation']['confidence'],
+        key=lambda x: x['validation'].get('confidence', 0),
         reverse=True
     )
 
@@ -1081,7 +1081,7 @@ def generate_appendix(synthesis: dict, output_path: str):
         appendix += f"""
 ### {i}. {heuristic['pattern']}
 
-**置信度**: {validation['confidence']:.3f}
+**置信度**: {validation.get('confidence', 0):.3f}
 
 **验证证据**:
 - 复现次数: {validation.get('evidence', {}).get('cross_domain', {}).get('occurrence_count', 0)}
