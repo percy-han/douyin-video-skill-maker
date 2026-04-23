@@ -1159,6 +1159,11 @@ def main():
     all_transcripts = []
     paginator = s3.get_paginator('list_objects_v2')
 
+    # 测试模式：限制处理文件数量
+    test_limit = int(os.environ.get('TEST_LIMIT', '0'))
+    if test_limit > 0:
+        print(f"   ⚠️  测试模式：只处理前 {test_limit} 个文件")
+
     for page in paginator.paginate(Bucket=S3_BUCKET, Prefix=S3_PREFIX):
         if 'Contents' not in page:
             continue
@@ -1173,8 +1178,16 @@ def main():
                     content = response['Body'].read().decode('utf-8')
                     transcript = json.loads(content)
                     all_transcripts.append(transcript)
+
+                    # 测试模式：达到限制后停止
+                    if test_limit > 0 and len(all_transcripts) >= test_limit:
+                        break
                 except Exception as e:
                     print(f"   ⚠️  跳过 {key}: {e}")
+
+        # 外层循环也要检查
+        if test_limit > 0 and len(all_transcripts) >= test_limit:
+            break
 
     print(f"   加载了 {len(all_transcripts)} 个转录文件")
 
