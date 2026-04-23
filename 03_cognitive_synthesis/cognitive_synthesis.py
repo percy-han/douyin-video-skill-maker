@@ -24,10 +24,9 @@ import re
 # ==================== 配置 ====================
 
 # Bedrock模型ID（可通过环境变量覆盖）
-# 使用cross-region inference profile以支持on-demand throughput
 BEDROCK_MODEL_ID = os.environ.get(
     'BEDROCK_MODEL_ID',
-    'us.anthropic.claude-opus-4-5-20250929-v1:0'  # Cross-region inference profile for Opus 4.5
+    'anthropic.claude-opus-4-7'  # Claude Opus 4.7 (latest)
 )
 
 # ==================== 三重验证器 ====================
