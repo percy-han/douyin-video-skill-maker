@@ -24,9 +24,10 @@ import re
 # ==================== 配置 ====================
 
 # Bedrock模型ID（可通过环境变量覆盖）
+# 使用inference profile以支持on-demand throughput
 BEDROCK_MODEL_ID = os.environ.get(
     'BEDROCK_MODEL_ID',
-    'anthropic.claude-opus-4-7'  # Claude Opus 4.7 (latest)
+    'us.anthropic.claude-opus-4-7'  # US inference profile for Opus 4.7
 )
 
 # ==================== 三重验证器 ====================
