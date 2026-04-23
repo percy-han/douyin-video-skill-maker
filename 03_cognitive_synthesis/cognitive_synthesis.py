@@ -1020,7 +1020,7 @@ def generate_appendix(synthesis: dict, output_path: str):
 
 - **心智模型**: {len(synthesis['mental_models'])} 个
 - **决策启发式**: {len(synthesis['heuristics'])} 条
-- **平均置信度**: {sum(m['validation'].get('confidence', 0) for m in synthesis['mental_models'])/len(synthesis['mental_models']):.3f}
+- **平均置信度**: {sum(m['validation'].get('confidence', 0) for m in synthesis['mental_models'])/len(synthesis['mental_models']) if synthesis['mental_models'] else 0:.3f}
 
 ---
 
@@ -1029,11 +1029,15 @@ def generate_appendix(synthesis: dict, output_path: str):
 """
 
     # 按置信度排序
-    sorted_models = sorted(
-        synthesis['mental_models'],
-        key=lambda x: x['validation'].get('confidence', 0),
-        reverse=True
-    )
+    if synthesis['mental_models']:
+        sorted_models = sorted(
+            synthesis['mental_models'],
+            key=lambda x: x['validation'].get('confidence', 0),
+            reverse=True
+        )
+    else:
+        sorted_models = []
+        appendix += "\n⚠️ **未提取到心智模型** - 可能原因：视频数量不足、内容重复度低、或验证标准过严\n\n"
 
     for i, model in enumerate(sorted_models, 1):
         validation = model['validation']
@@ -1069,11 +1073,15 @@ def generate_appendix(synthesis: dict, output_path: str):
     # 决策启发式部分
     appendix += "\n## 📋 完整决策启发式列表\n\n"
 
-    sorted_heuristics = sorted(
-        synthesis['heuristics'],
-        key=lambda x: x.get('validation', {}).get('confidence', 0),
-        reverse=True
-    )
+    if synthesis['heuristics']:
+        sorted_heuristics = sorted(
+            synthesis['heuristics'],
+            key=lambda x: x.get('validation', {}).get('confidence', 0),
+            reverse=True
+        )
+    else:
+        sorted_heuristics = []
+        appendix += "\n⚠️ **未提取到决策启发式** - 可能原因：视频数量不足、内容重复度低、或验证标准过严\n\n"
 
     for i, heuristic in enumerate(sorted_heuristics, 1):
         validation = heuristic.get('validation', {})
