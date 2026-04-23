@@ -596,7 +596,10 @@ class CognitiveSynthesizer:
                 })
                 print(f"      ✅ 心智模型（置信度: {validation['score']:.2f}）")
             elif validation['score'] > 0.3:
-                heuristics.append(candidate)
+                heuristics.append({
+                    **candidate,
+                    'validation': validation
+                })
                 print(f"      📋 决策启发式")
             else:
                 print(f"      ❌ 不通过验证")
