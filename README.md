@@ -175,28 +175,41 @@ python3 cognitive_synthesis.py
 
 ### 第4步：安装和使用Skill
 
+**📥 快速开始**：
+
 ```bash
-# 从S3下载SKILL.md
-aws s3 cp s3://bucket/path/SKILL.md ./SKILL.md
+# 方法1：从GitHub下载（推荐）
+wget https://raw.githubusercontent.com/percy-han/douyin-video-skill-maker/main/skills/SKILL_FULL.md
+
+# 方法2：从S3下载
+aws s3 cp s3://percyhan-douyin-video/post/刘德超/SKILL_FULL.md ./
 
 # 安装到Claude Code
-mkdir -p ~/.claude/skills/liudechao-perspective
-cp SKILL.md ~/.claude/skills/liudechao-perspective/
+mkdir -p ~/.claude/skills/liudechao-finance
+cp SKILL_FULL.md ~/.claude/skills/liudechao-finance/SKILL.md
 ```
 
-**在Claude Code中使用**：
+**🎯 在Claude Code中使用**：
 ```
 > 用刘德超的视角分析当前美联储降息的影响
 
-> 如果刘德超会怎么看人民币汇率走势？
+> 刘德超会怎么看人民币汇率走势？
 
 > 切换到观棋有语模式
 ```
 
-**Skill自动激活**（当用户提到）：
+**✨ Skill自动激活**（触发词）：
+- "用刘德超的视角"
 - "刘德超会怎么看"
-- "用观棋有语的视角"
-- "切换到刘德超"
+- "观棋有语模式"
+
+**📁 生成的文件**（位于 [`skills/`](skills/) 目录）：
+- `SKILL_FULL.md` - 可直接安装的Skill文件（176KB）
+- `SKILL_APPENDIX.md` - 深度研究附录，完整123个心智模型（177KB）
+- `cognitive_synthesis.json` - 机器可读的结构化数据（850KB）
+- `video_frameworks.json` - 单视频提取结果（4.1MB）
+
+详见：[skills/README.md](skills/README.md)
 
 ---
 
